@@ -1,0 +1,62 @@
+\chapter{Optimizations}
+\section{Kernel Polling Mode} 
+Instead of submitting the \texttt{io\_uring\_enter} system call to notify the kernel
+of new entries, we can use a kernel thread to continuously check the submission
+queue for new entries. To enable this is as simple as enabling the
+\texttt{IORING\_SETUP\_SQPOLL} on setup.
+Again, this is in the \texttt{io\_uring} theme of reducing syscalls.
+
+\section{Multi-shot SQEs}
+
+In general, each SQE being submitted corresponds to a single CQE received.
+However, in newer kernel versions, multi-shot SQEs have been introduced.
+As opposed to the existing one-shot SQEs, multi-shot SQEs can return multiple CQEs when applicable.
+For instance, the \texttt{accept()} system call is used to assign the next new connection to a new socket file descriptor.
+In the case of both the regular synchronous \texttt{accept()} and
+the \texttt{io\_uring} \texttt{IORING\_OP\_ACCEPT} asynchronous request,
+upon exiting and receiving each new connection, another accept syscall has to be made again to accept the next connection.
+With the multishot variant of \texttt{IORING\_OP\_ACCEPT},
+the kernel will continuously queue up new CQEs containing connection results without
+the user process having to rearm the submission queue with another accept request.
+This is more efficient because in the non-kernel polling case, this saves an
+\texttt{io\_uring\_enter} syscall, and in either case, saves the kernel from having to process an additional SQE.
+
+To implement support for multi-shot SQEs, we modify the requests table
+inside the \texttt{URingManager} to keep track of whether a request is multi-shot or one-shot. 
+Additionally, instead of deleting the entry upon receiving a CQE corresponding to a
+multi-shot SQE, we simply keep it in the requests table. Last but not least,
+for multi-shot SQE submissions, rather
+than a callback that does \texttt{putMVar}, we store a callback that spawns a new Haskell
+thread bounded to the same Capability (via \texttt{forkOn} because the direct file table
+is local to that specific Capability) that handles the results instead.
+
+% STRETCH GOAL
+% Figure X shows the pertinent code changes.
+
+\section{Fixed File Descriptors}
+
+At the kernel level,  in multi-threaded contexts, sharing a file descriptor table has a non-trivial overhead.
+A recent new development in \texttt{io\_uring} allows the usage of thread-local file descriptors and file descriptor tables, in what is referred to as fixed file descriptors.
+Fixed file descriptors have the same semantics as regular file descriptors, except they are managed by a user-allocated local file descriptor table.
+Therefore, these local fixed file descriptors are only valid in the same thread.
+These fixed file descriptors are operated on what is referred to as direct variants of existing syscalls/wrapper functions.
+For example, in liburing, there is both an \texttt{io\_uring\_prep\_accept()} and an \texttt{io\_uring\_prep\_accept\_direct()} wrapper function.
+
+Furthermore, it is also possible to pre-assign fixed file descriptors
+to syscall requests, such as \texttt{open()}-ing a file at a specific fixed file descriptor.
+However, we do not take advantage of this pre-assigning ability in our \texttt{URingManager} design.
+
+In order to accommodate fixed file descriptors in our \texttt{URingManager}, we most significantly had to change
+the way we scheduled our Haskell lightweight threads.
+In our original design, it was possible for a Haskell thread to submit an SQE to different
+\texttt{URingManager}s and therefore \texttt{io\_uring} submission queues between different requests.
+This is possible because the \texttt{URingManager} interface only allows for submitting the SQE request
+to the \texttt{URingManager} corresponding to the Capability that is currently executing the submitting Haskell thread,
+and Haskell threads are not necessarily bound to a specific Capability.
+The solution is to make sure that Haskell threads using fixed file descriptors in their
+logic need to be spawned with \texttt{forkOn} in order to be tied to a Capability.
+
+
+% TODO: STRETCH GOAL
+% Compare Figure Y to Figure Z to see the corresponding differences in code in order to
+% support fixed file descriptors and multi-shot SQEs.

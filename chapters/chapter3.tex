@@ -1,0 +1,31 @@
+\chapter{Existing Work and New Contributions}
+
+\section{Existing Benchmarks} 
+There have been mixed results in trying to demonstrate the performance benefits of the \texttt{io\_uring} interface. For networking workloads, at the time of writing, there have been a lot of open unresolved issues showing that \texttt{io\_uring} had equivalent if not worse performance compared to epoll \cite{gh_uring_issue_1,gh_uring_issue_2,gh_uring_issue_3}.
+
+On the other hand, in the case of storage I/O, for the same workload, a specifically configured \texttt{io\_uring} was able to achieve an 80\% increase in throughput over the existing Linux Asynchronous I/O (AIO) interface, and throughput just 15\% lower than the Storage Performance Development Kit (SPDK) API \cite{understandingStorage}.
+
+
+\section{Existing Work in GHC}
+This paper builds off of existing unfinished work in the GHC project.
+There are draft merge requests for an \texttt{EventManager} \cite{uring_event_manager}
+backend based on \texttt{io\_uring}, as well as an unfinished work-in-progress
+\texttt{URingManager} \cite{uring_manager_original}. Furthermore, there are aforementioned existing Haskell
+bindings to \texttt{io\_uring} that both merge requests and our URingManager utilize
+\cite{uring_bindings}.
+
+An important realization made in the merge request discussion regarding
+an \texttt{io\_uring} \texttt{EventManager} backend is that it would not fully take advantage
+of \texttt{io\_uring}’s ability to make submit system calls asynchronously.
+Since \texttt{epoll} is a system call, what the \texttt{io\_uring}-backed \texttt{EventManager}
+did was use \texttt{io\_uring} to submit \texttt{epoll} requests registering
+file descriptors, then keep track of requests, followed by notifying
+threads upon file descriptor readiness.
+
+\section{Our Contributions} 
+We complete the unfinished \texttt{URingManager} merge request into a
+working solution and iterate on our design with different performance
+optimizations. Next, we modify the Haskell \texttt{network} library to use the
+\texttt{URingManager} when available. Finally, we benchmark a simple Haskell
+web server backed by our modified \texttt{network} against the same server
+backed by the original \texttt{network} library.

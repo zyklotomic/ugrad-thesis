@@ -1,0 +1,20 @@
+\begin{abstrct}
+
+With the recent introduction of the new Linux \texttt{io\_uring} subsystem for
+asynchronous system calls, we explore both the performance and design
+considerations of integrating \texttt{io\_uring} into the Glasgow Haskell Compiler (GHC)
+runtime. We draw inspiration from the existing Multicore IO (MIO)
+\texttt{EventManager} \cite{mio}, a highly refined and tested polling-based
+(e.g. \texttt{epoll}, \texttt{kqueue}, \texttt{select}) approach
+to non-blocking I/O,
+to create \newline
+\texttt{URingManager}, our approach to utilizing \texttt{io\_uring}
+in the runtime. We find that in networking workloads, using
+\texttt{URingManager},
+\texttt{io\_uring}-driven asynchronous I/O is capable of achieving performance
+equivalent to that of the MIO \texttt{EventManager} with epoll. In terms of
+design, we find that our \texttt{URingManager} is also able to benefit from
+the cleaner asynchronous interface that \texttt{io\_uring} provides when
+compared to Linux Asynchronous I/O (AIO) and polling methods.
+
+\end{abstrct}

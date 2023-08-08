@@ -1,0 +1,26 @@
+\chapter{Discussion}
+\section{Analysis of Results} 
+From our benchmarks, we conclude that in the single-core case, \texttt{URingManager} is on par with \texttt{EventManager} in a networking workload. As for scaling, \texttt{URingManager} does not scale with the number of Capabilities. Throughput is actually inversely proportional to the number of Capabilities for \texttt{URingManager}, with progressively worse throughput the higher the number of Capabilities.
+
+We also observe that our results for the \texttt{EventManager} are in line with the findings in the paper that introduced the MIO \texttt{EventManager}; specifically, that throughput scales linearly with the number of Capabilities. The plateauing around 6 Capabilities is to be expected since the benchmarks were run on a 6-core processor.
+
+The  \texttt{io\_uring} \texttt{URingManager} also had significantly worse latencies for the higher percentiles of response time for high Capability counts. This would have made sense in the case of batched SQE submissions, where we submit and notify the kernel of new SQEs in batches, and thereby trading individual latency for throughput. However, we did not use submission batching in our \texttt{URingManager}. An alternative reason is that from a user space program, how the kernel processes and schedules new SQE submissions is a black box, and the internal kernel logic optimizes for overall throughput over individual latency.
+
+\section{Potential Setup Issues}
+The setup used to conduct the experiment was not optimal because there is a chance that both our web server that we benchmark and Apache Bench, the benchmarking program, were running on the same computer. Despite the usage of \texttt{cpuset}, the web server may have been bottlenecked by the CPU having to simultaneously schedule Apache Bench as well, having to accommodate the extra reads and writes of Apache Bench.
+
+Ideally, both programs would be running on two separate computers with a 10 Gigabit or above direct connection so as to remove all bottle-necks not pertaining to the web-server itself.
+
+\section{Design Merits of \texttt{io\_uring} and \texttt{URingManager}}
+Besides performance, \texttt{io\_uring} also aimed to be a cleaner replacement interface for asynchronous system calls over the existing Linux Asynchronous I/O (AIO) interface. AIO was notorious for being difficult to use and inconsistent.
+
+Issues of AIO include no support for buffered I/O, support for only direct file I/O, lack of glibc bindings, and that the API does not guarantee non-blocking calls.
+% (https://man7.org/linux/man-pages/man2/io_submit.2.html).
+Regarding the last point on blocking calls with AIO, it can happen for example if the programmer inadvertently passes in a file descriptor backed by a filesystem without non-blocking support into AIO’s \texttt{io\_submit} syscall. In short, it is hard to reason about whether an operation is truly non-blocking with AIO. \texttt{io\_uring} completely solves this problem because its design is fundamentally asynchronous. Even if a file descriptor does not support non-blocking, submitting an SQE is definitely a non-blocking operation.
+
+% http://blog.vmsplice.net/2015/08/asynchronous-file-io-on-linux-plus-ca.html
+
+
+Thus, despite its performance shortcomings in this paper, the design and usage experience of \texttt{io\_uring} is appreciated. We feel that this clean design trickles down into the design of URingManager too. Instead of interfacing with the EventManage to register interest and then perform the actual desired request, Haskell programmers can simply submit a request to URingManager. The completion-paradigm helps simplify the model of asynchronous computation.
+
+% https://lwn.net/Articles/776703/

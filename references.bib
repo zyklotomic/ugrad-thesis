@@ -1,0 +1,153 @@
+@article{mio,
+author = {Voellmy, Andreas Richard and Wang, Junchang and Hudak, Paul and Yamamoto, Kazuhiko},
+title = {Mio: A High-Performance Multicore Io Manager for GHC},
+year = {2013},
+issue_date = {December 2013},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {48},
+number = {12},
+issn = {0362-1340},
+url = {https://doi.org/10.1145/2578854.2503790},
+doi = {10.1145/2578854.2503790},
+abstract = {Haskell threads provide a key, lightweight concurrency abstraction to simplify the programming of important network applications such as web servers and software-defined network (SDN) controllers. The flagship Glasgow Haskell Compiler (GHC) introduces a run-time system (RTS) to achieve a high-performance multicore implementation of Haskell threads, by introducing effective components such as a multicore scheduler, a parallel garbage collector, an IO manager, and efficient multicore memory allocation. Evaluations of the GHC RTS, however, show that it does not scale well on multicore processors, leading to poor performance of many network applications that try to use lightweight Haskell threads. In this paper, we show that the GHC IO manager, which is a crucial component of the GHC RTS, is the scaling bottleneck. Through a series of experiments, we identify key data structure, scheduling, and dispatching bottlenecks of the GHC IO manager. We then design a new multicore IO manager named Mio that eliminates all these bottlenecks. Our evaluations show that the new Mio manager improves realistic web server throughput by 6.5x and reduces expected web server response time by 5.7x. We also show that with Mio, McNettle (an SDN controller written in Haskell) can scale effectively to 40+ cores, reach a throughput of over 20 million new requests per second on a single machine, and hence become the fastest of all existing SDN controllers.},
+journal = {SIGPLAN Not.},
+month = {sep},
+pages = {129–140},
+numpages = {12},
+keywords = {event notification, haskell, scalability, lightweight threads, io manager, concurrency, network programs, multicore processors, ghc}
+}
+ 
+@inproceedings{scalableIO,
+title	= {Scalable I/O Event Handling for GHC},
+author	= {Bryan O’Sullivan and Johan Tibell},
+year	= {2010},
+booktitle	= {Proceedings of the 2010 ACM SIGPLAN Haskell Symposium (Haskell'10)},
+pages	= {103--108}
+}
+
+
+@inproceedings{understandingStorage,
+author = {Didona, Diego and Pfefferle, Jonas and Ioannou, Nikolas and Metzler, Bernard and Trivedi, Animesh},
+title = {Understanding Modern Storage APIs: A Systematic Study of Libaio, SPDK, and Io_uring},
+year = {2022},
+isbn = {9781450393805},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3534056.3534945},
+doi = {10.1145/3534056.3534945},
+abstract = {Recent high-performance storage devices have exposed software inefficiencies in existing storage stacks, leading to a new breed of I/O stacks. The newest storage API of the Linux kernel is io_uring. We perform one of the first in-depth studies of io_uring, and compare its performance and dis-/advantages with the established libaio and SPDK APIs. Our key findings reveal that (i) polling design significantly impacts performance; (ii) with enough CPU cores io_uring can deliver performance close to that of SPDK; and (iii) performance scalability over multiple CPU cores and devices requires careful consideration and necessitates a hybrid approach. Last, we provide design guidelines for developers of storage intensive applications.},
+booktitle = {Proceedings of the 15th ACM International Conference on Systems and Storage},
+pages = {120–127},
+numpages = {8},
+location = {Haifa, Israel},
+series = {SYSTOR '22}
+}
+ 
+@inproceedings{concurrentHaskell,
+author = {Peyton Jones, Simon and Gordon, Andrew and Finne, Sigbjorn},
+title = {Concurrent Haskell},
+year = {1996},
+isbn = {0897917693},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/237721.237794},
+doi = {10.1145/237721.237794},
+booktitle = {Proceedings of the 23rd ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages},
+pages = {295–308},
+numpages = {14},
+location = {St. Petersburg Beach, Florida, USA},
+series = {POPL '96}
+}
+
+@inproceedings{multicoreSupport,
+author = {Marlow, Simon and Peyton Jones, Simon and Singh, Satnam},
+title = {Runtime Support for Multicore Haskell},
+year = {2009},
+isbn = {9781605583327},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/1596550.1596563},
+doi = {10.1145/1596550.1596563},
+abstract = {Purely functional programs should run well on parallel hardware because of the absence of side effects, but it has proved hard to realise this potential in practice. Plenty of papers describe promising ideas, but vastly fewer describe real implementations with good wall-clock performance. We describe just such an implementation, and quantitatively explore some of the complex design tradeoffs that make such implementations hard to build. Our measurements are necessarily detailed and specific, but they are reproducible, and we believe that they offer some general insights.},
+booktitle = {Proceedings of the 14th ACM SIGPLAN International Conference on Functional Programming},
+pages = {65–78},
+numpages = {14},
+keywords = {Haskell parallel runtime},
+location = {Edinburgh, Scotland},
+series = {ICFP '09}
+}
+
+@article{10.1145/1631687.1596563,
+author = {Marlow, Simon and Peyton Jones, Simon and Singh, Satnam},
+title = {Runtime Support for Multicore Haskell},
+year = {2009},
+issue_date = {September 2009},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {44},
+number = {9},
+issn = {0362-1340},
+url = {https://doi.org/10.1145/1631687.1596563},
+doi = {10.1145/1631687.1596563},
+abstract = {Purely functional programs should run well on parallel hardware because of the absence of side effects, but it has proved hard to realise this potential in practice. Plenty of papers describe promising ideas, but vastly fewer describe real implementations with good wall-clock performance. We describe just such an implementation, and quantitatively explore some of the complex design tradeoffs that make such implementations hard to build. Our measurements are necessarily detailed and specific, but they are reproducible, and we believe that they offer some general insights.},
+journal = {SIGPLAN Not.},
+month = {aug},
+pages = {65–78},
+numpages = {14},
+keywords = {Haskell parallel runtime}
+}
+
+@misc{gh_uring_issue_1,
+  author = {Unknown},
+  title = {io\_uring is slower than epoll},
+  year = {2020},
+  note = {Last accessed 4 August 2023,
+    \newline \url{https://github.com/axboe/liburing/issues/189}},
+  url = {https://github.com/axboe/liburing/issues/189}
+}
+
+@misc{gh_uring_issue_2,
+  author = {Bob Chen},
+  title = {Yet another comparison between io\_uring and epoll on network performance},
+  year = {2022},
+  note = {Last accessed 4 August 2023, \url{https://github.com/axboe/liburing/issues/536}},
+  url = {https://github.com/axboe/liburing/issues/536}
+}
+
+@misc{gh_uring_issue_3,
+  author = {Johannes Lundberg},
+  title = {Too many threads with IOSQE\_ASYNC and bad performance without...},
+  year = {2021},
+  note = {Last accessed 4 August 2023, \url{https://github.com/axboe/liburing/issues/420}},
+  url = {https://github.com/axboe/liburing/issues/420}
+}
+
+@misc{uring_event_manager,
+  author = {Wander Hillen},
+  title = {WIP: Implement I/O event manager based on io\_uring},
+  year = {2020},
+  note = {Last accessed 4 August 2023, \url{https://gitlab.haskell.org/ghc/ghc/-/merge_requests/3794}},
+}
+
+@misc{uring_manager_original,
+  author = {Ben Gamari},
+  title = {Draft: Implement I/O based on io\_uring},
+  year = {2020},
+  note = {Last accessed 4 August 2023, \url{https://gitlab.haskell.org/ghc/ghc/-/merge_requests/8073}},
+}
+
+@misc{uring_bindings,
+  author = {Ben Gamari},
+  title = {A simple set of io-uring bindings in Haskell},
+  year = {2020},
+  note = {Last accessed 4 August 2023, \url{https://github.com/bgamari/io-uring}},
+}
+
+@misc{google_security,
+  author = {Tamás Koczka},
+  title = {Learnings from kCTF VRP's 42 Linux kernel exploits submissions},
+  year = {2023},
+  note = {Last accessed 4 August 2023, \url{https://security.googleblog.com/2023/06/learnings-from-kctf-vrps-42-linux.html}},
+}
+

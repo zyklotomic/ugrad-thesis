@@ -1,0 +1,25 @@
+\chapter{Benchmarking}
+\section{Web Server Benchmark Program}
+We slightly modify the simple HTTP web server program
+used to benchmark MIO \cite{mio} for own benchmark.
+We use our version of the \texttt{network} library that supports our URingManager. The web server, listening on a specified address, receives HTTP requests and then responds with a fixed HTTP response regardless of received content.
+
+When benchmarking, we test two versions of the server: one without URingManager (using default \texttt{epoll EventManager}) and one with \texttt{URingManager}. We initially wished to benchmark a modified version of our \texttt{URingManager} with all the mentioned optimizations in the previous section, however, our implementation unfortunately would frequently hang. This made it impossible to reliably test. 
+The main parts of the server are shown in Figure \ref{fig:WebServer}
+
+\begin{figure}[ht]
+    \centering
+	\lstinputlisting[language=Haskell]{figures/code/WebServer.hs}
+	\caption[Benchmarked Web Server Source]{Main parts of our web server}
+	\label{fig:WebServer}
+\end{figure} 
+
+The sources are all included in the monorepo \url{https://github.com/zyklotomic/uring-manager}.
+
+\section{Setup} 
+We used Apache Bench (\texttt{ab}) to measure the time taken for 10,000  default HTTP requests of size 151 bytes each with a variable number of concurrent connections to be processed by our web server.
+
+Hardware-wise, an AMD Ryzen 5 2600 Six-Core Processor with 16 GB of RAM was used. The Linux kernel version used was 6.4.3 on the NixOS distribution.
+
+Both the Apache Bench and the web-server program were running on the same CPU. In order to minimize variance caused by scheduling, the Linux \texttt{cpuset} mechanism was used to reserve 8 cores for the web-server program only, and 1 core for the single-threaded Apache Bench. Kernel threads were allowed to run on the aforementioned reserved cores.
+

@@ -1,0 +1,24 @@
+\chapter{Introduction}
+
+Currently, a popular and well-tested approach to efficient asynchronous I/O is through the
+use of polling mechanisms. Depending on the operating system, system calls such as \texttt{epoll}, \texttt{kqueue}, or \texttt{select},
+can be used to register a file descriptor for interest in potentially blocking I/O,
+as well as receive notification that the file descriptor is ready and guaranteed to not
+block on the desired I/O operation. This design has also been the basis of concurrent Haskell
+programs.
+The design was refined upon, into what is now the MIO \texttt{EventManager}
+\cite{mio, scalableIO},
+where now multiple cores could each manage their own pending I/O notifications, and schedule their respective threads.
+
+More recently, Linux introduced \texttt{io\_uring}, a new asynchronous system call facility that uses a
+completion-based paradigm, fundamentally different from the readiness-based paradigm of polling mechanisms.
+In \texttt{io\_uring}, instead of waiting for the kernel to notify user threads of readiness events as in epoll,
+a task carrying a request to perform a potentially blocking I/O operation is sent to the kernel,
+and when the operation is complete, the kernel responds with the result. Theoretically,
+the design is expected to be more efficient
+due to fewer syscalls required. However, in practice, the possible
+performance gains have come into question.
+
+Hence, our motivation for writing \texttt{URingManager}: firstly trying to gauge the performance of \texttt{io\_uring},
+especially with Haskell’s lightweight green threading-based runtime system, and secondly,
+exploring this new paradigm of asynchronous programming.

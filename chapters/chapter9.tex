@@ -1,0 +1,24 @@
+\chapter{Future Work}
+
+\section{More Rigorous Benchmarking} 
+As mentioned under our Discussion section, the benchmarking ideally would have been run on a multi-computer rather than a single-computer setup. With an optimal benchmarking setup, we can be more certain of the reason behind why our \texttt{URingManager} did not perform as good as our theoretical expectations for \texttt{io\_uring}. Furthermore, we were only focused on network I/O workloads. It would be worthwhile to benchmark file I/O with the \texttt{URingManager} too.
+
+\section{Optimizing \texttt{URingManager}}
+The \texttt{epoll} interface was introduced in Linux kernel version 2.5.44, in 2002,
+which was over two decades ago. Meanwhile, \texttt{io\_uring} was first introduced in kernel 5.1 in May 2019. Unlike \texttt{io\_uring}, we have had many years to perfect how to use epoll to achieve its full potential. The theoretical reasoning of \texttt{io\_uring} using less system calls and therefore more performant is there, we believe that we just have not figured out the best design for using \texttt{io\_uring}. Thus, it would be  productive to further research on how to optimize the performance of \texttt{URingManager}.
+
+\section{Vulnerabilities in \texttt{io\_uring}} 
+Recently, Google’s security team stated in a report of their vulnerability bounty program that 60\% of submitted exploits involved \texttt{io\_uring}. As a result, Google has disabled \texttt{io\_uring} in a few of their Linux-based products such as Android and ChromeOS, as well as in their production servers \cite{google_security}. Due to the infancy of \texttt{io\_uring}, the alarming number of vulnerabilities is not unexpected. Nonetheless, \texttt{URingManager}, and any other usage of \texttt{io\_uring} is not mature enough for production usage until further work is done to ensure the safety of exposing the \texttt{io\_uring} interface. Possible research directions could include formal verification as well as more vulnerability bounties.
+
+\section{Windows I/O Completion Ports} 
+Windows has I/O Completion Ports (IOCP), a very close equivalent to \texttt{io\_uring}. Similar to \texttt{io\_uring}, IOCP also features a queue to submit requests such as reading and writing to files, and sending to and receiving from sockets. It would be of interest to explore making a unified I/O queueing interface as a generalized \texttt{URingManager} so that we can support IOCP as well.
+
+\section{Generalization of the Event Manager}
+Building on generalizing \texttt{URingManager} for Windows IOCP, an alternative approach is generalizing
+EventManager to manage all types of asynchronous requests, of which \texttt{URingManager} is one
+implementation. While we did decide against this approach as mentioned in our Design Considerations,
+we believe this idea is still worth exploring. We can implement a generalized EventManager for \texttt{epoll}
+by having the manager under the hood handle both registering file descriptors to epoll in addition to
+the actual requested system call. The benefits of such a generalized EventManager would be a more
+unified interface and more portable Haskell code. However, the major downsides would be the
+increased maintenance burden in the GHC RTS and the potential inflexibility if a more custom request scheduling policy is desired.
